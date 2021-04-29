@@ -1,5 +1,5 @@
 # Version suffix - use preview suffix for CI builds that are not tagged (i.e. unofficial)
-$VersionSuffix = ""
+$VersionSuffix = "icoinsoft"
 if ($env:APPVEYOR -eq "True" -and $env:APPVEYOR_REPO_TAG -eq "false") {
     $VersionSuffix = "preview-" + $env:APPVEYOR_BUILD_NUMBER.PadLeft(4, '0')
 }

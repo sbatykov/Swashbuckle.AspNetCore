@@ -2,13 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0;net5.0</TargetFrameworks>
-    <AssemblyName>Swashbuckle.AspNetCore.Annotations</AssemblyName>
+    <AssemblyName>Swashbuckle.AspNetCore.Annotations.Attributres</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <SignAssembly Condition="'$(OS)'=='Windows_NT'">true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Swashbuckle.AspNetCore.Annotations.snk</AssemblyOriginatorKeyFile>
     <Description>Provides custom attributes that can be applied to controllers, actions and models to enrich the generated Swagger</Description>
-    <PackageId>Swashbuckle.AspNetCore.Annotations</PackageId>
+    <PackageId>Swashbuckle.AspNetCore.Annotations.Attributes</PackageId>
     <PackageTags>swagger;documentation;discovery;help;webapi;aspnet;aspnetcore;annotations</PackageTags>
     <PackageProjectUrl>https://github.com/domaindrivendev/Swashbuckle.AspNetCore</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
@@ -16,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Swashbuckle.AspNetCore.Annotations.Attributes\Swashbuckle.AspNetCore.Annotations.Attributes.csproj" />
-    <ProjectReference Include="..\Swashbuckle.AspNetCore.SwaggerGen\Swashbuckle.AspNetCore.SwaggerGen.csproj" />
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Swashbuckle.AspNetCore.Annotations</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
-
 </Project>
