@@ -104,7 +104,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (subType.BaseType == null)
                 return null;
 
-            var subTypeAttribute = subType.BaseType.GetCustomAttributes(false)
+            var subTypeAttribute = subType.BaseType.GetCustomAttributes(true)
                 .OfType<SwaggerSubTypeAttribute>()
                 .FirstOrDefault(attr => attr.SubType == subType);
 
