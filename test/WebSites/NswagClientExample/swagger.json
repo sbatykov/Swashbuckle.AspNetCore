@@ -19,47 +19,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Animal"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Cat"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Dog"
-                  }
-                ]
+                "$ref": "#/components/schemas/Animal"
               }
             },
             "text/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Animal"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Cat"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Dog"
-                  }
-                ]
+                "$ref": "#/components/schemas/Animal"
               }
             },
             "application/*+json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Animal"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Cat"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Dog"
-                  }
-                ]
+                "$ref": "#/components/schemas/Animal"
               }
             }
           },

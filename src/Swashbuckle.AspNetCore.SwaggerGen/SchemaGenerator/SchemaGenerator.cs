@@ -39,17 +39,28 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
             return GenerateSchemaForType(modelType, schemaRepository);
         }
 
+        private (DataContract, OpenApiSchema) GenerateSchemaFor(
+            Type modelType,
+            SchemaRepository schemaRepository)
+        {
+            var dataContract = GetDataContractFor(modelType);
+
+            var schema = _generatorOptions.UseOneOfForPolymorphism
+                    && IsBaseTypeWithKnownTypesDefined(dataContract, out var knownTypesDataContracts)
+                    && !HasDiscriminator(dataContract)
+                ? GeneratePolymorphicSchema(dataContract, schemaRepository, knownTypesDataContracts)
+                : GenerateConcreteSchema(dataContract, schemaRepository);
+
+            return (dataContract, schema);
+        }
+
         private OpenApiSchema GenerateSchemaForMember(
             Type modelType,
             SchemaRepository schemaRepository,
             MemberInfo memberInfo,
             DataProperty dataProperty = null)
         {
-            var dataContract = GetDataContractFor(modelType);
-
-            var schema = _generatorOptions.UseOneOfForPolymorphism && IsBaseTypeWithKnownTypesDefined(dataContract, out var knownTypesDataContracts)
-                ? GeneratePolymorphicSchema(dataContract, schemaRepository, knownTypesDataContracts)
-                : GenerateConcreteSchema(dataContract, schemaRepository);
+            var (dataContract, schema) = GenerateSchemaFor(modelType, schemaRepository);
 
             if (_generatorOptions.UseAllOfToExtendReferenceSchemas && schema.Reference != null)
             {
@@ -98,11 +109,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
             SchemaRepository schemaRepository,
             ParameterInfo parameterInfo)
         {
-            var dataContract = GetDataContractFor(modelType);
-
-            var schema = _generatorOptions.UseOneOfForPolymorphism && IsBaseTypeWithKnownTypesDefined(dataContract, out var knownTypesDataContracts)
-                ? GeneratePolymorphicSchema(dataContract, schemaRepository, knownTypesDataContracts)
-                : GenerateConcreteSchema(dataContract, schemaRepository);
+            var (dataContract, schema) = GenerateSchemaFor(modelType, schemaRepository);
 
             if (_generatorOptions.UseAllOfToExtendReferenceSchemas && schema.Reference != null)
             {
@@ -134,11 +141,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
 
         private OpenApiSchema GenerateSchemaForType(Type modelType, SchemaRepository schemaRepository)
         {
-            var dataContract = GetDataContractFor(modelType);
-
-            var schema = _generatorOptions.UseOneOfForPolymorphism && IsBaseTypeWithKnownTypesDefined(dataContract, out var knownTypesDataContracts)
-                ? GeneratePolymorphicSchema(dataContract, schemaRepository, knownTypesDataContracts)
-                : GenerateConcreteSchema(dataContract, schemaRepository);
+            var (_, schema) = GenerateSchemaFor(modelType, schemaRepository);
 
             if (schema.Reference == null)
             {
@@ -406,6 +409,14 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
 
             baseTypeDataContract = GetDataContractFor(baseType);
             return true;
+        }
+
+        private bool HasDiscriminator(DataContract dataContract)
+        {
+            var discriminatorName = _generatorOptions.DiscriminatorNameSelector(dataContract.UnderlyingType)
+                ?? dataContract.ObjectTypeNameProperty;
+
+            return (discriminatorName != null);
         }
 
         private bool TryGetDiscriminatorFor(
