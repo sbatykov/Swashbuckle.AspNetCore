@@ -343,7 +343,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
                     schema.AllOf.Add(baseTypeSchema);
 
                     applicableDataProperties = applicableDataProperties
-                        .Where(dataProperty => dataProperty.MemberInfo.DeclaringType == dataContract.UnderlyingType);
+                        .Where(dataProperty => !dataProperty.MemberInfo.DeclaringType.IsAssignableFrom(baseTypeDataContract.UnderlyingType));
                 }
 
                 if (IsBaseTypeWithKnownTypesDefined(dataContract, out var knownTypesDataContracts))
@@ -394,10 +394,15 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
         {
             baseTypeDataContract = null;
 
-            var baseType = dataContract.UnderlyingType.BaseType;
+            var baseType = dataContract.UnderlyingType;
 
-            if (baseType == null || baseType == typeof(object) || !_generatorOptions.SubTypesSelector(baseType).Contains(dataContract.UnderlyingType))
-                return false;
+            do
+            {
+                baseType = baseType.BaseType;
+                if (baseType == null || baseType == typeof(object))
+                    return false;
+            }
+            while (!_generatorOptions.SubTypesSelector(baseType).Contains(dataContract.UnderlyingType));
 
             baseTypeDataContract = GetDataContractFor(baseType);
             return true;
