@@ -4,10 +4,10 @@ namespace Swashbuckle.AspNetCore.Newtonsoft.Test
 {
     public class TypeWithPropertiesSetViaConstructor
     {
-        public TypeWithPropertiesSetViaConstructor(int id, string description)
+        public TypeWithPropertiesSetViaConstructor(int id, string desc)
         {
             Id = id;
-            Description = description;
+            Description = desc;
         }
 
         public int Id { get; }
