@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+#if NET6_0_OR_GREATER
+using Microsoft.AspNetCore.Http.Metadata;
+#endif
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Routing;
 
 namespace Swashbuckle.AspNetCore.SwaggerGen
 {
@@ -61,12 +65,34 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
 
         private string DefaultOperationIdSelector(ApiDescription apiDescription)
         {
-            return apiDescription.ActionDescriptor.AttributeRouteInfo?.Name;
+            var actionDescriptor = apiDescription.ActionDescriptor;
+
+            // Resolve the operation ID from the route name and fallback to the
+            // endpoint name if no route name is available. This allows us to
+            // generate operation IDs for endpoints that are defined using
+            // minimal APIs.
+#if (!NETSTANDARD2_0)
+            return
+                actionDescriptor.AttributeRouteInfo?.Name
+                ?? (actionDescriptor.EndpointMetadata?.LastOrDefault(m => m is IEndpointNameMetadata) as IEndpointNameMetadata)?.EndpointName;
+#else
+            return actionDescriptor.AttributeRouteInfo?.Name;
+#endif
         }
 
         private IList<string> DefaultTagsSelector(ApiDescription apiDescription)
         {
+#if (!NET6_0_OR_GREATER)
             return new[] { apiDescription.ActionDescriptor.RouteValues["controller"] };
+#else
+            var actionDescriptor = apiDescription.ActionDescriptor;
+            var tagsMetadata = actionDescriptor.EndpointMetadata?.LastOrDefault(m => m is ITagsMetadata) as ITagsMetadata;
+            if (tagsMetadata != null)
+            {
+                return new List<string>(tagsMetadata.Tags);
+            }
+            return new[] { apiDescription.ActionDescriptor.RouteValues["controller"] };        
+#endif
         }
 
         private string DefaultSortKeySelector(ApiDescription apiDescription)
